@@ -9,36 +9,9 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include "games_state.h"
 
 
-struct GameState{
-    std::vector<int> piles;
-    std::vector<bool> zeromoves;
-    bool isJohn;
-    bool operator==(const GameState  &) const;
-};
-bool GameState::operator==(const GameState  &f) const {
-    return (
-    (piles == f.piles) &&
-    (zeromoves==f.zeromoves) &&
-    (isJohn == f.isJohn));
-}
-// Custom hash function for type GameState
-struct GameStateHasher {
-    std::hash<std::string> hasher;//defined by unordered map
-    int operator()(const GameState &gs) const {
-        std::stringstream ss;
-        for (auto i: gs.piles){
-            ss << i;
-        }
-        ss<<"-";
-        for (auto i: gs.zeromoves){
-            ss << i;
-        }
-        //std::cout<<"STRING: "<<ss.str()<<std::endl;
-        return hasher(ss.str());
-    }
-};
 // declare global variable
 std::unordered_map<GameState, bool, GameStateHasher> gs_tracker;
 
@@ -46,40 +19,16 @@ std::unordered_map<GameState, bool, GameStateHasher> gs_tracker;
 std::ifstream fin("input/test_case_1.txt", std::ifstream::in);
 
 
-//return indices of non-zero piles
-std::vector<int> getPossibleNormalMoves(std::vector<int> piles){
-    std::vector<int> result;
-    for (int i=0; i<piles.size(); ++i){
-        if(piles[i]!=0){
-            result.push_back(i);
-        }
-    }
-    return result;
-}
-
-//return indices of piles with no zero-move yet
-std::vector<int> getPossibleZeroMoves(std::vector<bool> zeromove){
-    std::vector<int> result;
-    for (int i=0; i<zeromove.size(); ++i){
-        if(zeromove[i]==false){
-            result.push_back(i);
-        }
-    }
-    return result;
-}
-
-
 bool johnWins(GameState gs){
    
    // Chech the memo-map. Maybe we have already seen that gamestate
    if (gs_tracker.find(gs)!=gs_tracker.end()){
-       //std::cout<<"MEMO WORKS"<<std::endl;
        return gs_tracker[gs];
    }
 
    //base case of the player winning
-   auto pos_norm_moves=getPossibleNormalMoves(gs.piles);
-   auto pos_zero_moves=getPossibleZeroMoves(gs.zeromoves);
+   auto pos_norm_moves=GameState::getPossibleNormalMoves(gs.piles);
+   auto pos_zero_moves=GameState::getPossibleZeroMoves(gs.zeromoves);
 
    // Base case: no zero-moves and only one pile left with size 1
    if(pos_zero_moves.size()==0 && pos_norm_moves.size()==1 && gs.piles[pos_norm_moves[0]]==1){
@@ -103,11 +52,14 @@ bool johnWins(GameState gs){
        results.push_back(johnWins(new_gs));
    }
 
-    // If it's Johns turn, then he wins, so long as any of the moves returns true
+
     bool result;
     if(gs.isJohn){
-        result = std::find(results.begin(), results.end(), true)!=results.end();
+        // If it's Johns turn, then he wins, so long as any of the moves returns true
+         result = std::find(results.begin(), results.end(), true)!=results.end();
     } else {
+        // If it's Kates turn, then he wins, so long as there is no turn here that makes Kate win
+        // Remember, both player are palying optimally.
         result = std::find(results.begin(), results.end(), false)==results.end();
     }
     gs_tracker[gs]=result;
@@ -116,23 +68,13 @@ bool johnWins(GameState gs){
 }
 
 char zeroMoveNim(std::vector<int> piles) {
-    /*
-     * Write your code here.
-     */
 
-    char result;
-    
     // Inititalize the vector, thats keeping track of zero moves
     std::vector<bool> zeromoves(piles.size());
     GameState gs{piles, zeromoves, true};
-    bool win = johnWins(gs);
-    if (win){
-        return 'W';
-    }
-    return 'L';
+    char result = johnWins(gs) ? 'W' : 'L';
+    return result;
 }
-
-
 
 
 int main(){
