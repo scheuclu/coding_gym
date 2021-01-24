@@ -10,10 +10,11 @@
 #include <string>
 #include <sstream>
 #include "games_state.h"
+#include <set>
 
 
 // This is used as replacement for the cin stream on hackerrank
-std::ifstream fin("input/test_case_1.txt", std::ifstream::in);
+std::ifstream fin("input/test_case_3.txt", std::ifstream::in);
 
 
 bool johnWins(GameState gs){
@@ -69,6 +70,10 @@ char zeroMoveNim(std::vector<int> piles) {
     // Inititalize the vector, thats keeping track of zero moves
     std::vector<bool> zeromoves(piles.size());
     GameState gs{piles, zeromoves, true};
+    gs = reduceMagic(gs);
+    for(auto i: gs.piles){
+        std::cout<<i<<"-";
+    }; std::cout<<std::endl;
     char result = johnWins(gs) ? 'W' : 'L';
     return result;
 }
@@ -95,9 +100,14 @@ int main(){
         vec.push_back(num);
       }
       std::cout<<std::endl;
-      
+    
       char result = zeroMoveNim(vec);
       std::cout<<"Result: "<<result<<std::endl;
    }
 
 }
+
+// How to fix this
+// 1. Do all possible zero move combinations right away 
+// 2. Then play regular zero nims
+// 3. Use an std::set to store the piles. That way the the order of piles won't matter when hashed.

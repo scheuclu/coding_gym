@@ -15,6 +15,7 @@ class GameState{
         bool operator==(const GameState  &) const;
         static std::vector<int> getPossibleNormalMoves(const std::vector<int> &piles);
         static std::vector<int> getPossibleZeroMoves(const std::vector<int> &piles, const std::vector<bool> &zeromove);
+
 };
 
 bool GameState::operator==(const GameState  &f) const {
@@ -62,4 +63,19 @@ struct GameStateHasher {
         //std::cout<<"STRING: "<<ss.str()<<std::endl;
         return hasher(ss.str());
     }
+};
+
+
+
+// One can simple reduce each pile by multiples of 2
+GameState reduceMagic(GameState gs){
+   std::vector<int>::iterator it;
+    for(it=gs.piles.begin(); it!=gs.piles.end(); it++){
+        while (*it>5){
+            *it-=2;
+        }
+    }
+
+    return gs;
+
 };
