@@ -2,15 +2,21 @@
 #include <sstream>
 #include <unordered_map>
 
+//forward declaration
+struct GameStateHasher;
+
 class GameState{
     public:
         std::vector<int> piles;
         std::vector<bool> zeromoves;
         bool isJohn;
+        // declare global variable
+        static std::unordered_map<GameState, bool, GameStateHasher> gs_tracker;
         bool operator==(const GameState  &) const;
         static std::vector<int> getPossibleNormalMoves(std::vector<int> piles);
         static std::vector<int> getPossibleZeroMoves(std::vector<bool> zeromove);
 };
+
 bool GameState::operator==(const GameState  &f) const {
     return (
     (piles == f.piles) &&

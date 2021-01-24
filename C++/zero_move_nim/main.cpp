@@ -12,18 +12,15 @@
 #include "games_state.h"
 
 
-// declare global variable
-std::unordered_map<GameState, bool, GameStateHasher> gs_tracker;
-
 // This is used as replacement for the cin stream on hackerrank
 std::ifstream fin("input/test_case_1.txt", std::ifstream::in);
 
 
 bool johnWins(GameState gs){
-   
+
    // Chech the memo-map. Maybe we have already seen that gamestate
-   if (gs_tracker.find(gs)!=gs_tracker.end()){
-       return gs_tracker[gs];
+   if (GameState::gs_tracker.find(gs)!=GameState::gs_tracker.end()){
+       return GameState::gs_tracker[gs];
    }
 
    //base case of the player winning
@@ -33,7 +30,7 @@ bool johnWins(GameState gs){
    // Base case: no zero-moves and only one pile left with size 1
    if(pos_zero_moves.size()==0 && pos_norm_moves.size()==1 && gs.piles[pos_norm_moves[0]]==1){
        // If it's John's turn in this situation he wins, otherwise he loses
-       gs_tracker[gs]=gs.isJohn;
+       GameState::gs_tracker[gs]=gs.isJohn;
        return gs.isJohn;
    }
 
@@ -62,7 +59,7 @@ bool johnWins(GameState gs){
         // Remember, both player are palying optimally.
         result = std::find(results.begin(), results.end(), false)==results.end();
     }
-    gs_tracker[gs]=result;
+    GameState::gs_tracker[gs]=result;
     return result;
 
 }
@@ -76,7 +73,8 @@ char zeroMoveNim(std::vector<int> piles) {
     return result;
 }
 
-
+// static member variable need to be initialized at the global namespace
+std::unordered_map<GameState, bool, GameStateHasher> GameState::gs_tracker{};
 int main(){
    std::string word;
    int N, L, num;
@@ -84,7 +82,6 @@ int main(){
    fin >> N;
    std::cout<<"N: "<<N<<std::endl;
    
-
    // Loop over number of games
    for(int i=0; i<N; ++i){
       std::vector<int> vec;
@@ -102,7 +99,5 @@ int main(){
       char result = zeroMoveNim(vec);
       std::cout<<"Result: "<<result<<std::endl;
    }
-
-   
 
 }
