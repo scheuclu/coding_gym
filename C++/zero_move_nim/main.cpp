@@ -25,7 +25,7 @@ bool johnWins(GameState gs){
 
    //base case of the player winning
    auto pos_norm_moves=GameState::getPossibleNormalMoves(gs.piles);
-   auto pos_zero_moves=GameState::getPossibleZeroMoves(gs.zeromoves);
+   auto pos_zero_moves=GameState::getPossibleZeroMoves(gs.piles, gs.zeromoves);
 
    // Base case: no zero-moves and only one pile left with size 1
    if(pos_zero_moves.size()==0 && pos_norm_moves.size()==1 && gs.piles[pos_norm_moves[0]]==1){

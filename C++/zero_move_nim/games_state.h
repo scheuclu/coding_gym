@@ -13,8 +13,8 @@ class GameState{
         // declare global variable
         static std::unordered_map<GameState, bool, GameStateHasher> gs_tracker;
         bool operator==(const GameState  &) const;
-        static std::vector<int> getPossibleNormalMoves(std::vector<int> piles);
-        static std::vector<int> getPossibleZeroMoves(std::vector<bool> zeromove);
+        static std::vector<int> getPossibleNormalMoves(const std::vector<int> &piles);
+        static std::vector<int> getPossibleZeroMoves(const std::vector<int> &piles, const std::vector<bool> &zeromove);
 };
 
 bool GameState::operator==(const GameState  &f) const {
@@ -25,7 +25,7 @@ bool GameState::operator==(const GameState  &f) const {
 }
 
 //return indices of non-zero piles
-std::vector<int> GameState::getPossibleNormalMoves(std::vector<int> piles){
+std::vector<int> GameState::getPossibleNormalMoves(const std::vector<int> &piles){
     std::vector<int> result;
     for (int i=0; i<piles.size(); ++i){
         if(piles[i]!=0){
@@ -36,10 +36,11 @@ std::vector<int> GameState::getPossibleNormalMoves(std::vector<int> piles){
 }
 
 //return indices of piles with no zero-move yet
-std::vector<int> GameState::getPossibleZeroMoves(std::vector<bool> zeromove){
+//No need to try zero moves unless there's 2 or less ont he pile
+std::vector<int> GameState::getPossibleZeroMoves(const std::vector<int> &piles, const std::vector<bool> &zeromove){
     std::vector<int> result;
     for (int i=0; i<zeromove.size(); ++i){
-        if(zeromove[i]==false){
+        if(zeromove[i]==false && piles[i]<3){
             result.push_back(i);
         }
     }
